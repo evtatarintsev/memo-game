@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Memo</title>
+    <link rel="icon" href="cartoon/back.svg">
+
+    <style>
+        .memo {
+            justify-content: center;
+            display: flex;
+        }
+
+        td img {
+            width: 100px;
+        }
+    </style>
+    <script>
+        let width = 4
+        let height = 4
+
+        let field = [];
+        let openedCards = [];
+        window.onload = _ => {
+            createNewGame();
+            drawCards();
+        };
+
+        function createNewGame() {
+            let cards = shuffleCards();
+            for (let i = 0; i < height; i++) {
+                let row = [];
+                for (let j = 0; j < width; j++) {
+                    let code = cards[i * height + j];
+                    row.push({
+                        y: i,
+                        x: j,
+                        image: `${code}`,
+                        code: code,
+                        opened: false,
+                    });
+                }
+                field.push(row);
+            }
+        }
+
+        function drawCards() {
+            let table = document.getElementById("field");
+            let html = "";
+            for (let row of field) {
+                html += "<tr>";
+                for (let td of row) {
+                    let image = "cartoon/back.svg"
+                    if (td.opened === true) {
+                        image = `cartoon/${td.image}.svg`
+                    }
+                    html += `<td><img src="${image}" onClick="imageClick(${td.x}, ${td.y});"></td>`
+                }
+                html += "</tr>";
+            }
+            table.innerHTML = html;
+        }
+
+        function imageClick(x, y) {
+            let card = field[y][x]
+            if (openedCards.length === 2) {
+                let first = {
+                    x: openedCards[0].x,
+                    y: openedCards[0].y,
+                }
+                let second = {
+                    x: openedCards[1].x,
+                    y: openedCards[1].y,
+                }
+
+                let firstCard = field[first.y][first.x]
+                let secondCard = field[second.y][second.x]
+
+                if (firstCard.code !== secondCard.code) {
+                    firstCard.opened = false
+                    secondCard.opened = false
+                }
+                openedCards = []
+            }
+            if (card.opened === false) {
+                card.opened = true
+                openedCards.push({
+                    x, y,
+                });
+            }
+
+            drawCards();
+        }
+
+        function shuffleCards() {
+            let totalCardsCount = width * height;
+            let images = [];
+            for (let i = 0; i < totalCardsCount / 2; i++) {
+                images.push(i + 1);
+                images.push(i + 1);
+            }
+            let randList = []
+            for (let i = 0; i < images.length; i++) {
+                randList.push(Math.random());
+            }
+            return images.map((img, i) => [img, randList[i]]).sort((a, b) => a[1] - b[1]).map(a => a[0]);
+        }
+    </script>
+</head>
+<body>
+<div class="memo">
+    <table id="field">
+    </table>
+</div>
+</body>
+</html>
